@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mygis-core"
+version = "0.1.0"
+description = "Core utilities for MyGIS: logging and configuration"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "MyGIS Maintainers" }]
+license = { text = "Proprietary" }
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: Other/Proprietary License",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.optional-dependencies]
+yaml = ["pyyaml>=6.0"]
+
+[project.urls]
+Homepage = "https://github.com/your-org/MyGIS"
+
+[project.scripts]
+mygis = "mygis_core.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mygis_core*"]
+exclude = []
