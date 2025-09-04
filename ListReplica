@@ -5,13 +5,28 @@
 from arcgis.gis import GIS
 from arcgis.features import FeatureLayerCollection
 from datetime import datetime
+from typing import Optional
 import re
+from mygis_core import log as mylog, config as myconfig
 
-# --- AUTHENTICATE (pick ONE based on your setup) ---
-gis = GIS("pro")  # uses your signed-in ArcGIS Pro credentials
-# gis = GIS("home")
-# gis = GIS("https://www.arcgis.com", "USERNAME", "PASSWORD")
-# gis = GIS("https://portal.yourorg.com/portal", "USERNAME", "PASSWORD")  # Enterprise
+def _get_gis_from_config(cfg: Optional[myconfig.Config] = None) -> GIS:
+    """Create a GIS connection based on configuration/env.
+
+    Supported options in config/env (prefix MYGIS_ for env vars):
+    - auth: "pro" (default) | "home"
+    - portal_url, username, password: for explicit portal auth
+    """
+    cfg = cfg or myconfig.load_config()
+    auth = str(cfg.get("auth", "pro")).lower()
+    if auth in ("pro", "home"):
+        return GIS(auth)
+    portal_url = cfg.get("portal_url") or cfg.get("portal")
+    username = cfg.get("username")
+    password = cfg.get("password")
+    if portal_url and username and password:
+        return GIS(str(portal_url), str(username), str(password))
+    # Fallback to pro if nothing else configured
+    return GIS("pro")
 
 def _to_fs_root(url: str) -> str:
     """Ensure we have the FeatureServer *root* URL (strip the /0, /1, etc.)."""
@@ -32,14 +47,16 @@ def _epoch_ms_to_iso(ms):
     except Exception:
         return str(ms)
 
-def list_replicas(service_url_or_itemid: str, *, verbose=True):
+def list_replicas(service_url_or_itemid: str, *, verbose: bool = True, gis: Optional[GIS] = None):
+    logger = mylog.get_logger(__name__)
     # Resolve to Feature Service root URL
     if service_url_or_itemid.startswith("http"):
         fs_root = _to_fs_root(service_url_or_itemid)
-        flc = FeatureLayerCollection(fs_root, gis=gis)
+        flc = FeatureLayerCollection(fs_root, gis=(gis or _get_gis_from_config()))
     else:
         # treat as item id
-        item = gis.content.get(service_url_or_itemid)
+        gis_obj = gis or _get_gis_from_config()
+        item = gis_obj.content.get(service_url_or_itemid)
         if item is None:
             raise ValueError("Item not found or not accessible.")
         flc = FeatureLayerCollection.fromitem(item)
@@ -49,6 +66,7 @@ def list_replicas(service_url_or_itemid: str, *, verbose=True):
     sync_enabled = getattr(props, "syncEnabled", None)
     if sync_enabled is False:
         if verbose:
+            logger.warning("Service does not have sync enabled; replicas will not exist.")
             print("⚠️  This service does not have sync enabled; replicas will not exist.")
         return []
 
@@ -59,7 +77,7 @@ def list_replicas(service_url_or_itemid: str, *, verbose=True):
 
     if verbose:
         if not replicas:
-            print("No replicas found.")
+            logger.info("No replicas found.")
             return replicas
 
         # Pretty print a compact summary table
@@ -90,11 +108,11 @@ def list_replicas(service_url_or_itemid: str, *, verbose=True):
         def fmt(vals):  # simple fixed-width line
             return "  ".join(str(v).ljust(widths[i]) for i, v in enumerate(vals))
 
-        print(fmt(headers))
-        print(fmt(["-"*w for w in widths]))
+        logger.info(fmt(headers))
+        logger.info(fmt(["-"*w for w in widths]))
         for r in replicas:
-            print(fmt(row(r)))
-        print(f"\nTotal replicas: {len(replicas)}")
+            logger.info(fmt(row(r)))
+        logger.info(f"Total replicas: {len(replicas)}")
 
     return replicas
 
