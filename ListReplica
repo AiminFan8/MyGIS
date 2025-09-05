@@ -2,31 +2,14 @@
 # - Input: Feature Service *root* URL, a layer URL (…/FeatureServer/0), or an Item ID
 # - Output: prints a summary table and returns a list of replica dicts
 
-from arcgis.gis import GIS
 from arcgis.features import FeatureLayerCollection
+from arcgis.gis import GIS
 from datetime import datetime
 from typing import Optional
 import re
-from mygis_core import log as mylog, config as myconfig
+from mygis_core import log as mylog
+from mygis_core import auth as myauth
 
-def _get_gis_from_config(cfg: Optional[myconfig.Config] = None) -> GIS:
-    """Create a GIS connection based on configuration/env.
-
-    Supported options in config/env (prefix MYGIS_ for env vars):
-    - auth: "pro" (default) | "home"
-    - portal_url, username, password: for explicit portal auth
-    """
-    cfg = cfg or myconfig.load_config()
-    auth = str(cfg.get("auth", "pro")).lower()
-    if auth in ("pro", "home"):
-        return GIS(auth)
-    portal_url = cfg.get("portal_url") or cfg.get("portal")
-    username = cfg.get("username")
-    password = cfg.get("password")
-    if portal_url and username and password:
-        return GIS(str(portal_url), str(username), str(password))
-    # Fallback to pro if nothing else configured
-    return GIS("pro")
 
 def _to_fs_root(url: str) -> str:
     """Ensure we have the FeatureServer *root* URL (strip the /0, /1, etc.)."""
@@ -52,10 +35,10 @@ def list_replicas(service_url_or_itemid: str, *, verbose: bool = True, gis: Opti
     # Resolve to Feature Service root URL
     if service_url_or_itemid.startswith("http"):
         fs_root = _to_fs_root(service_url_or_itemid)
-        flc = FeatureLayerCollection(fs_root, gis=(gis or _get_gis_from_config()))
+        flc = FeatureLayerCollection(fs_root, gis=(gis or myauth.get_gis()))
     else:
         # treat as item id
-        gis_obj = gis or _get_gis_from_config()
+        gis_obj = gis or myauth.get_gis()
         item = gis_obj.content.get(service_url_or_itemid)
         if item is None:
             raise ValueError("Item not found or not accessible.")
