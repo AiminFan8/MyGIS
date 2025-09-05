@@ -17,3 +17,5 @@ profile = "work"
 # log_format = "plain"  # or "json"
 # log_file = "mygis.log"
 
+# Optional: scope hosted services search (examples/list_sync_enabled_services.py)
+# search_owner = "me"      # or a username, or "*" for any

@@ -87,6 +87,9 @@ profile = "work"
 # portal_url = "https://example.com/portal"
 # username = "alice"
 # password = "<SECRET>"
+
+# Optional search scoping for examples/list_sync_enabled_services.py
+# search_owner = "me"   # or a username, or "*" for any accessible owner
 ```
 
 ### Example auth config (YAML)
@@ -98,6 +101,9 @@ mygis:
   # portal_url: https://example.com/portal
   # username: alice
   # password: <SECRET>
+
+  # Optional search scoping for examples/list_sync_enabled_services.py
+  # search_owner: me   # or username, or "*"
 ```
 
 ### Example env vars
@@ -108,6 +114,9 @@ MYGIS_PROFILE=work
 # MYGIS_PORTAL_URL=https://example.com/portal
 # MYGIS_USERNAME=alice
 # MYGIS_PASSWORD=secret
+
+# Optional: scope listing to an owner in examples/list_sync_enabled_services.py
+# MYGIS_SEARCH_OWNER=me
 ```
 
 Security tip: prefer profiles or OS credential stores; avoid committing secrets.
@@ -140,6 +149,9 @@ MYGIS_SERVICE_URL=https://example.com
 - `mygis_core.log.get_logger(name=None)`
 - `mygis_core.config.load_config(defaults=None, paths=None, env_prefix="MYGIS_", env_override=True)`
 - `mygis_core.config.load_and_apply_logging(cfg=None)`
+- `mygis_core.replicas.list_replicas(service_url_or_itemid, verbose=True, gis=None)`
+- `mygis_core.replicas.find_hosted_feature_services(gis=None, query=None, max_items=1000)`
+- `mygis_core.replicas.list_replicas_for_sync_enabled_services(gis=None, query=None, max_items=1000, verbose=True)`
 
 ## Notes
 
