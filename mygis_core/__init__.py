@@ -1,4 +1,4 @@
-"""Core utilities for logging and configuration.
+"""Core utilities for logging, configuration, and auth.
 
 Usage:
     from mygis_core import log, config
@@ -8,7 +8,6 @@ Usage:
     logger.info("Ready", extra={"cfg_keys": list(cfg.keys())})
 """
 
-from . import log, config  # re-export for convenience
+from . import log, config, auth  # re-export for convenience
 
-__all__ = ["log", "config"]
-
+__all__ = ["log", "config", "auth"]

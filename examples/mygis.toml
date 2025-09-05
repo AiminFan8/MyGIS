@@ -1,0 +1,19 @@
+[mygis]
+# Authentication examples — pick ONE approach
+
+# 1) Use a saved ArcGIS profile (recommended)
+profile = "work"
+
+# 2) Or ArcGIS Pro/Home sign-in
+# auth = "pro"  # or "home"
+
+# 3) Or explicit portal credentials
+# portal_url = "https://example.com/portal"
+# username = "alice"
+# password = "<SECRET>"
+
+# Optional logging settings
+# log_level = "INFO"
+# log_format = "plain"  # or "json"
+# log_file = "mygis.log"
+

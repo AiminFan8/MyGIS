@@ -5,6 +5,7 @@ from typing import Optional
 
 from . import config as config_mod
 from . import log as log_mod
+from . import replicas as replicas_mod
 
 
 def _add_common_args(p: argparse.ArgumentParser):
@@ -46,6 +47,19 @@ def _cmd_config_show(args) -> int:
     return 0
 
 
+def _cmd_replicas_list(args) -> int:
+    # Configure logging and load config; auth is resolved inside list_replicas
+    _configure_from_args(args)
+    replicas = replicas_mod.list_replicas(
+        args.service,
+        verbose=not args.quiet,
+        gis=None,
+    )
+    if args.json:
+        print(json.dumps(replicas, ensure_ascii=False))
+    return 0
+
+
 def _cmd_log_test(args) -> int:
     _configure_from_args(args)
     logger = log_mod.get_logger("mygis")
@@ -77,6 +91,18 @@ def build_parser() -> argparse.ArgumentParser:
     _add_common_args(p_log_test)
     p_log_test.set_defaults(func=_cmd_log_test)
 
+    # replicas commands
+    p_repl = subparsers.add_parser("replicas", help="Replica operations")
+    _add_common_args(p_repl)
+    sp_repl = p_repl.add_subparsers(dest="subcommand", required=True)
+
+    p_repl_list = sp_repl.add_parser("list", help="List replicas for a service URL or item ID")
+    _add_common_args(p_repl_list)
+    p_repl_list.add_argument("service", help="FeatureService root URL, layer URL, or Item ID")
+    p_repl_list.add_argument("--json", action="store_true", help="Print replicas as JSON to stdout")
+    p_repl_list.add_argument("--quiet", action="store_true", help="Suppress summary table logging")
+    p_repl_list.set_defaults(func=_cmd_replicas_list)
+
     return parser
 
 
@@ -92,4 +118,3 @@ def main(argv: Optional[list[str]] = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-

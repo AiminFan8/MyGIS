@@ -43,6 +43,7 @@ Install, then run:
 mygis --log-level DEBUG log test
 mygis config show --pretty
 mygis --config mygis.toml config show
+mygis replicas list "https://.../FeatureServer/0" --json
 ```
 
 Common flags:
@@ -50,12 +51,66 @@ Common flags:
 - `--log-level`, `--log-format` (`plain`|`json`), `--log-file`
 - `--config` to point to a specific config file
 - `--no-env-override` to ignore environment variables
+ - `replicas list`: accepts a service root URL, a layer URL, or a Feature Service item ID. Use `--json` to print raw JSON.
 
 ## Configuration Sources
 
 - Files (first found wins): `mygis.toml`, `mygis.yaml`, `mygis.yml`, `mygis.json`, `mygis.ini`, `.env`
 - Environment variables override when prefixed with `MYGIS_` (e.g., `MYGIS_SERVICE_URL`)
 - Types are coerced from strings when defaults are provided (e.g., booleans/ints).
+
+## Authentication
+
+`mygis_core.auth.get_gis()` builds an ArcGIS `GIS` connection from config/env.
+
+- Resolution order:
+  - `profile` (or `arcgis_profile` / `agol_profile`) → `GIS(profile=...)`
+  - `auth` = `pro` or `home` → `GIS("pro"|"home")`
+  - `portal_url` (or `portal`) + `username` + `password` → `GIS(url, user, pass)`
+  - fallback → `GIS("pro")`
+
+You can set these via config files or env vars prefixed with `MYGIS_`.
+
+### Example auth config (TOML)
+
+Put this in `mygis.toml` or `examples/mygis.toml` and set `--config examples/mygis.toml`:
+
+```toml
+[mygis]
+# Use a saved ArcGIS profile
+profile = "work"
+
+# Or use Pro/Home sign-in
+# auth = "pro"  # or "home"
+
+# Or explicit portal credentials
+# portal_url = "https://example.com/portal"
+# username = "alice"
+# password = "<SECRET>"
+```
+
+### Example auth config (YAML)
+
+```yaml
+mygis:
+  profile: work
+  # auth: pro
+  # portal_url: https://example.com/portal
+  # username: alice
+  # password: <SECRET>
+```
+
+### Example env vars
+
+```
+MYGIS_PROFILE=work
+# MYGIS_AUTH=pro
+# MYGIS_PORTAL_URL=https://example.com/portal
+# MYGIS_USERNAME=alice
+# MYGIS_PASSWORD=secret
+```
+
+Security tip: prefer profiles or OS credential stores; avoid committing secrets.
 
 ### Logging via Env Vars
 
