@@ -168,6 +168,22 @@ python examples/check_collaboration_workspace.py \
   --json
 ```
 
+You can also provide the group IDs via env or config:
+
+```
+export MYGIS_HOST_GROUP=<HOST_GROUP_ID>
+export MYGIS_GUEST_GROUP=<GUEST_GROUP_ID>
+python examples/check_collaboration_workspace.py --host-profile host_admin --guest-profile guest_admin
+```
+
+Or in config (TOML/YAML under the `mygis` table):
+
+```toml
+[mygis]
+host_group = "<HOST_GROUP_ID>"
+guest_group = "<GUEST_GROUP_ID>"
+```
+
 Or compare a single item pair directly:
 
 ```bash

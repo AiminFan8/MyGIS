@@ -147,14 +147,26 @@ def main(argv: Optional[list[str]] = None) -> int:
             print(f"{title or ''} -> {status}")
         return 0
 
-    if not (args.host_group and args.guest_group):
-        parser.error("Provide either --host-item/--guest-item or --host-group/--guest-group")
+    # Resolve group IDs from args -> env -> config
+    host_group = (
+        args.host_group
+        or os.environ.get("MYGIS_HOST_GROUP")
+        or cfg.get("host_group")
+    )
+    guest_group = (
+        args.guest_group
+        or os.environ.get("MYGIS_GUEST_GROUP")
+        or cfg.get("guest_group")
+    )
+
+    if not (host_group and guest_group):
+        parser.error("Provide either --host-item/--guest-item or host/guest group ids via args/env/config")
 
     results = check_collaboration_groups(
         host_gis=host_gis,
         guest_gis=guest_gis,
-        host_group_id=args.host_group,
-        guest_group_id=args.guest_group,
+        host_group_id=str(host_group),
+        guest_group_id=str(guest_group),
         verbose=not args.quiet,
     )
 
