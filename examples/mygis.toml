@@ -2,8 +2,8 @@
 # Authentication examples — pick ONE approach
 
 # 1) Use a saved ArcGIS profile (recommended)
-profile = "work"
-
+guest_profile=maps
+host_profile=AGOLAdmin
 # 2) Or ArcGIS Pro/Home sign-in
 # auth = "pro"  # or "home"
 
@@ -19,3 +19,6 @@ profile = "work"
 
 # Optional: scope hosted services search (examples/list_sync_enabled_services.py)
 # search_owner = "me"      # or a username, or "*" for any
+
+host_group=065d5114e7df4a158b7a42c27c27fdf9
+guest_group=2dc5164c3c1648d7b4abea8ef80bf973
