@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mygis-core"
-version = "0.1.1"
+version = "0.1.2"
 description = "Core utilities for MyGIS: logging and configuration"
 readme = "README.md"
 requires-python = ">=3.9"
