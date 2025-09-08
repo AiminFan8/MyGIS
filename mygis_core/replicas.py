@@ -189,3 +189,6 @@ def list_replicas_for_sync_enabled_services(
     if verbose:
         logger.info("Sync-enabled hosted services: %d", extra={"count": len(results)})
     return results
+
+
+# Collaboration health checks moved to mygis_core/collab.py

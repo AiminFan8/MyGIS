@@ -152,6 +152,31 @@ MYGIS_SERVICE_URL=https://example.com
 - `mygis_core.replicas.list_replicas(service_url_or_itemid, verbose=True, gis=None)`
 - `mygis_core.replicas.find_hosted_feature_services(gis=None, query=None, max_items=1000)`
 - `mygis_core.replicas.list_replicas_for_sync_enabled_services(gis=None, query=None, max_items=1000, verbose=True)`
+- `mygis_core.collab.compare_feature_service_items(host_gis, guest_gis, host_item_id, guest_item_id, verbose=True)`
+- `mygis_core.collab.check_collaboration_groups(host_gis=..., guest_gis=..., host_group_id=..., guest_group_id=..., verbose=True)`
+
+### Example: Check Collaboration Workspace
+
+Run a health check for items shared between two collaboration groups (host vs guest):
+
+```bash
+python examples/check_collaboration_workspace.py \
+  --host-profile host_admin \
+  --guest-profile guest_admin \
+  --host-group <HOST_GROUP_ID> \
+  --guest-group <GUEST_GROUP_ID> \
+  --json
+```
+
+Or compare a single item pair directly:
+
+```bash
+python examples/check_collaboration_workspace.py \
+  --host-profile host_admin \
+  --guest-profile guest_admin \
+  --host-item <HOST_ITEM_ID> \
+  --guest-item <GUEST_ITEM_ID>
+```
 
 ## Notes
 
