@@ -44,7 +44,23 @@ from mygis_core.collab import (
 
 
 def _configure_logging_and_load_config(args) -> config_mod.Config:
-    paths = [args.config] if args.config else None
+    # Prefer explicit path first, then search cwd and examples/* fallbacks
+    fallback_paths = (
+        "mygis.toml",
+        "mygis.yaml",
+        "mygis.yml",
+        "mygis.json",
+        "mygis.ini",
+        ".env",
+        # fallbacks in examples/
+        "examples/mygis.toml",
+        "examples/mygis.yaml",
+        "examples/mygis.yml",
+        "examples/mygis.json",
+        "examples/mygis.ini",
+        "examples/.env",
+    )
+    paths = ([args.config] + list(fallback_paths)) if args.config else fallback_paths
     cfg = config_mod.load_config(paths=paths, env_override=not args.no_env_override)
     level = args.log_level or cfg.get("log_level")
     fmt = args.log_format or cfg.get("log_format")
@@ -130,10 +146,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Optional[list[str]] = None) -> int:
+    print('main() called')
     parser = build_parser()
     args = parser.parse_args(argv)
     cfg = _configure_logging_and_load_config(args)
-
+    print(cfg)
     host_gis = _gis_from_args_env("host", args, cfg)
     guest_gis = _gis_from_args_env("guest", args, cfg)
 
@@ -152,11 +169,13 @@ def main(argv: Optional[list[str]] = None) -> int:
         args.host_group
         or os.environ.get("MYGIS_HOST_GROUP")
         or cfg.get("host_group")
+        or cfg.get("MYGIS_HOST_GROUP")
     )
     guest_group = (
         args.guest_group
         or os.environ.get("MYGIS_GUEST_GROUP")
         or cfg.get("guest_group")
+        or cfg.get("MYGIS_GUEST_GROUP")
     )
 
     if not (host_group and guest_group):

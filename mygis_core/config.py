@@ -181,6 +181,21 @@ def load_config(
             file_layer = file_data["mygis"]
         else:
             file_layer = file_data
+
+        # Normalize env-style keys from file (e.g., .env) into lower-case without prefix
+        # so MYGIS_HOST_GROUP in a file becomes cfg['host_group'].
+        try:
+            prefix_upper = str(env_prefix).upper()
+            normalized = {}
+            for k, v in list(file_layer.items()):
+                if isinstance(k, str) and k.upper().startswith(prefix_upper):
+                    key = k[len(env_prefix) :].lower()
+                    normalized[key] = v
+            if normalized:
+                _deep_merge(file_layer, normalized)
+        except Exception:
+            pass
+
         _deep_merge(cfg, file_layer)
 
     if env_override:
@@ -212,4 +227,3 @@ def load_and_apply_logging(cfg: Optional[Config] = None):
 
     log_mod.configure_logging(level=level, json_format=json_format, file=file)
     return cfg
-
