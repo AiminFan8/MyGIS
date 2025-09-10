@@ -3,6 +3,7 @@ pyproject.toml
 mygis_core/__init__.py
 mygis_core/auth.py
 mygis_core/cli.py
+mygis_core/collab.py
 mygis_core/config.py
 mygis_core/log.py
 mygis_core/replicas.py
