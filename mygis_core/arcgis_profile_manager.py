@@ -117,16 +117,19 @@ def create_profile(
     api_key: Optional[str] = None,   # <— re-enable
     verify_cert: bool = True,
 ) -> None:
-    if api_key:
-        gis = GIS(url=url or None, api_key=api_key, profile=name, verify_cert=verify_cert)
+    if name in credman_list_arcgis(service = "arcgis_python_api_profile_passwords"):
+        print(f'{name} alredy exists!')
     else:
-        if not url:
-            raise SystemExit("--url is required for username/password profiles.")
-        if not username:
-            raise SystemExit("--username is required for username/password profiles.")
-        if not password:
-            password = getpass.getpass("Password: ")
-        gis = GIS(url=url, username=username, password=password, profile=name, verify_cert=verify_cert)
+        if api_key:
+            gis = GIS(url=url or None, api_key=api_key, profile=name, verify_cert=verify_cert)
+        else:
+            if not url:
+                raise SystemExit("--url is required for username/password profiles.")
+            if not username:
+                raise SystemExit("--username is required for username/password profiles.")
+            if not password:
+                password = getpass.getpass("Password: ")
+            gis = GIS(url=url, username=username, password=password, profile=name, verify_cert=verify_cert)
 
 def show_profile(name: str) -> None:
     p = Path.home() / ".arcgis" / "python_api" / "profiles" / name
