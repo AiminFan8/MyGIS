@@ -117,7 +117,10 @@ def create_profile(
     api_key: Optional[str] = None,   # <— re-enable
     verify_cert: bool = True,
 ) -> None:
-    if name in credman_list_arcgis(service = "arcgis_python_api_profile_passwords"):
+    existingitems=credman_list_arcgis(service = "arcgis_python_api_profile_passwords")
+    existingNames=[item['name'] for item in existingitems]
+    #print(existingNames)
+    if name in existingNames:
         print(f'{name} alredy exists!')
     else:
         if api_key:
