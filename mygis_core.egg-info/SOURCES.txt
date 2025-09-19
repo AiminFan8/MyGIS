@@ -1,6 +1,7 @@
 README.md
 pyproject.toml
 mygis_core/__init__.py
+mygis_core/arcgis_profile_manager.py
 mygis_core/auth.py
 mygis_core/cli.py
 mygis_core/collab.py
